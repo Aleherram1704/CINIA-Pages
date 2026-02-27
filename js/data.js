@@ -39,4 +39,4 @@ function actualizarUI(data) {
 setInterval(obtenerDatos, 5000);
 
 // primera carga inmediata
-obtenerDatos();
+obtenerDatos(console.log("Datos recibidos:", data););
