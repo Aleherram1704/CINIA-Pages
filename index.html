@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Panel Principal</title>
-
   <link rel="stylesheet" href="./css/styles.css" />
 </head>
 
@@ -16,7 +15,28 @@
 
     <h1 class="dashboard-title">Control de Pantallas</h1>
 
-    <div id="screenGrid" class="screen-grid"></div>
+    <!-- ===== Selector de pantalla ===== -->
+    <section class="screen-selector-section">
+      <h2>Pantallas</h2>
+      <div id="screenSelectorGrid" class="screen-selector-grid"></div>
+    </section>
+
+    <!-- ===== Configuración de límites ===== -->
+    <section class="limits-section">
+      <h2>Configuración de Límites por Pantalla</h2>
+
+      <div id="limitsEditor" class="limits-editor"></div>
+
+      <div class="limits-actions">
+        <button id="saveLimits" class="upload-btn">
+          Guardar Límites
+        </button>
+
+        <button id="deleteMedia" class="delete-btn">
+          Borrar Contenido de Esta Pantalla
+        </button>
+      </div>
+    </section>
 
   </main>
 

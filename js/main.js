@@ -1,41 +1,148 @@
-/* =====================================================
-   PANEL PRINCIPAL
-===================================================== */
+const METRIC_KEYS = [
+  "rendimiento",
+  "ppm",
+  "disponibilidad",
+  "tds",
+  "mvr",
+  "cd",
+  "hph"
+];
+
+const DEFAULT_LIMITS = {
+  rendimiento: { green: 90, yellow: 75, type: "higher" },
+  ppm: { green: 500, yellow: 1500, type: "lower" },
+  disponibilidad: { green: 90, yellow: 75, type: "higher" },
+  tds: { green: 90, yellow: 75, type: "higher" },
+  mvr: { green: 100, yellow: 95, type: "range" },
+  cd: { green: 90, yellow: 75, type: "higher" },
+  hph: { green: 10, yellow: 8, type: "higher" }
+};
 
 const TOTAL_SCREENS = 15;
-const grid = document.getElementById("screenGrid");
 
-for (let i = 1; i <= TOTAL_SCREENS; i++) {
+let currentScreen = "pantalla1";
 
-  const screenId = "pantalla" + i;
-  const STORAGE_KEY = "media_" + screenId;
-  const saved = localStorage.getItem(STORAGE_KEY);
+const grid = document.getElementById("screenSelectorGrid");
+const editor = document.getElementById("limitsEditor");
+const saveBtn = document.getElementById("saveLimits");
+const deleteBtn = document.getElementById("deleteMedia");
 
-  const card = document.createElement("div");
-  card.className = "screen-card";
+/* ===== Render selector visual ===== */
 
-  card.innerHTML = `
-    <h2>Pantalla ${i}</h2>
+function renderScreenSelector() {
 
-    <div class="status ${saved ? "active" : "empty"}">
-      ${saved ? "Contenido cargado" : "Sin contenido"}
-    </div>
+  grid.innerHTML = "";
 
-    <div class="card-actions">
-      <a href="pantalla${i}.html" class="open-btn">Abrir</a>
-      <button class="clear-btn">Limpiar</button>
-    </div>
-  `;
+  for (let i = 1; i <= TOTAL_SCREENS; i++) {
 
-  /* ===== limpiar contenido ===== */
+    const screenId = "pantalla" + i;
+    const hasMedia = 
+      localStorage.getItem("media_" + screenId) ||
+      localStorage.getItem("playlist_" + screenId);
 
-  card.querySelector(".clear-btn").addEventListener("click", () => {
+    const card = document.createElement("div");
+    card.className = "screen-card";
+    if (screenId === currentScreen) card.classList.add("active");
 
-    if (!confirm("¿Borrar contenido de Pantalla " + i + "?")) return;
+    card.innerHTML = `
+      <strong>P${i}</strong>
+      <span class="status ${hasMedia ? "ok" : "empty"}">
+        ${hasMedia ? "SI" : "NO"}
+      </span>
+    `;
 
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
+    card.onclick = () => {
+      currentScreen = screenId;
+      renderScreenSelector();
+      loadLimits();
+      renderEditor();
+    };
+
+    grid.appendChild(card);
+  }
+}
+
+/* ===== Límites ===== */
+
+let limits = {};
+
+function loadLimits() {
+
+  const saved = JSON.parse(
+    localStorage.getItem("metricLimits_" + currentScreen)
+  );
+
+  if (!saved) {
+    limits = JSON.parse(JSON.stringify(DEFAULT_LIMITS));
+  } else {
+    // Mezcla defaults con lo guardado
+    limits = { ...DEFAULT_LIMITS, ...saved };
+  }
+}
+
+function renderEditor() {
+
+  editor.innerHTML = "";
+
+  const grid = document.createElement("div");
+  grid.className = "limits-grid";
+
+  METRIC_KEYS.forEach(key => {
+
+    const config = limits[key] || DEFAULT_LIMITS[key];
+
+    const card = document.createElement("div");
+    card.className = "limit-card";
+
+    card.innerHTML = `
+      <h3>${key}</h3>
+
+      <div class="limit-input-row">
+        <label>🟢 Verde</label>
+        <input type="number" data-key="${key}" data-type="green" value="${config.green}">
+      </div>
+
+      <div class="limit-input-row">
+        <label>🟡 Amarillo</label>
+        <input type="number" data-key="${key}" data-type="yellow" value="${config.yellow}">
+      </div>
+    `;
+
+    grid.appendChild(card);
   });
 
-  grid.appendChild(card);
+  editor.appendChild(grid);
 }
+
+saveBtn.addEventListener("click", () => {
+
+  const inputs = document.querySelectorAll("#limitsEditor input");
+
+  inputs.forEach(input => {
+    const key = input.dataset.key;
+    const type = input.dataset.type;
+    limits[key][type] = Number(input.value);
+  });
+
+  localStorage.setItem("metricLimits_" + currentScreen, JSON.stringify(limits));
+
+  alert("Límites guardados para " + currentScreen);
+});
+
+/* ===== Borrar contenido ===== */
+
+deleteBtn.addEventListener("click", () => {
+
+  if (!confirm("¿Seguro que quieres borrar el contenido?")) return;
+
+  localStorage.removeItem("media_" + currentScreen);
+
+  renderScreenSelector();
+  alert("Contenido eliminado.");
+});
+
+/* ===== Inicializar ===== */
+
+loadLimits();
+renderEditor();
+renderScreenSelector();

@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="./css/styles.css" />
 </head>
 
-<body class="screen-view">
+<body class="screen-view" data-screen="pantalla2">
 
   <!-- CONTENIDO DE LA PANTALLA -->
   <main class="screen-layout">
@@ -24,28 +24,57 @@
 
     <!-- ===== ZONA DERECHA (CONTADORES) ===== -->
     <aside class="sidebar">
-
+          
       <div class="counter-card">
-        <h3>Producción</h3>
-        <div class="counter" id="counter1">0</div>
+        <h3>Rendimiento</h3>
+        <div class="counter" id="rendimiento">0</div>
       </div>
-
+    
       <div class="counter-card">
-        <h3>Meta</h3>
-        <div class="counter" id="counter2">0</div>
+        <h3>PPM's</h3>
+        <div class="counter" id="ppm">0</div>
       </div>
+    
+      <div class="counter-card">
+        <h3>Disponibilidad</h3>
+        <div class="counter" id="disponibilidad">0</div>
+      </div>
+    
+      <div class="counter-card">
+        <h3>Tasa de servicio</h3>
+        <div class="counter" id="tds">0</div>
+      </div>
+    
+      <div class="counter-card">
+        <h3>MTM vs Real</h3>
+        <div class="counter" id="mvr">0</div>
+      </div>
+    
+      <div class="counter-card">
+        <h3>Core documentos</h3>
+        <div class="counter" id="cd">0</div>
+      </div>
+    
+      <div class="counter-card">
+        <h3>Hora por hora</h3>
+        <div class="counter" id="hph">0</div>
+      </div>
+      
+    </aside>
 
       <!-- Botón de carga -->
       <div class="screen-controls">
         <label class="upload-btn">
-          Subir contenido Pantalla 1
-          <input type="file" id="fileInput" accept="image/*,video/*">
+          Subir contenido Pantalla 2
+          <input type="file" id="fileInput" accept="image/*,video/*" multiple>
         </label>
-
-         <button class="delete-btn" id="deleteContent">
+        
+        <button class="delete-btn" id="deleteContent">
           Eliminar contenido
         </button>
       </div>
+
+
 
     </aside>
 
@@ -59,6 +88,8 @@
   <script>
     initPantalla("pantalla2");
   </script>
+
+  <script src="./js/data.js"></script>
 
 </body>
 </html>

@@ -1,45 +1,86 @@
-/* ============================================
-CONEXIÓN A NODE-RED
-============================================ */
+const API_URL = "http://10.50.83.96:1880/indicadores";
 
-const API_URL = "http://10.50.85.79:1880/indicadores";
-// 👆 PON TU IP REAL DE NODE-RED
+/* ===== Detectar pantalla automáticamente ===== */
+
+const screenId = document.body.dataset.screen || "pantalla1";
+
+/* ===== Cargar límites dinámicos por pantalla ===== */
+
+function loadLimits() {
+  return JSON.parse(
+    localStorage.getItem("metricLimits_" + screenId)
+  ) || {};
+}
+
+/* ===== Obtener datos ===== */
 
 async function obtenerDatos() {
-try {
-const res = await fetch(API_URL);
-const data = await res.json();
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
 
-```
-console.log("Datos recibidos:", data); // ← debug
+    console.log("Datos recibidos:", data);
+    actualizarUI(data);
 
-actualizarUI(data);
-```
-
-} catch (err) {
-console.error("Error leyendo Node-RED:", err);
-}
+  } catch (err) {
+    console.error("Error leyendo Node-RED:", err);
+  }
 }
 
-/* ============================================
-ACTUALIZA CONTADORES EN PANTALLA
-============================================ */
+/* ===== Actualizar UI ===== */
 
 function actualizarUI(data) {
 
-const prod = document.getElementById("contador-produccion");
-const meta = document.getElementById("contador-meta");
+  const limits = loadLimits();
 
-if (prod) prod.textContent = data.produccion ?? "--";
-if (meta) meta.textContent = data.meta ?? "--";
+  Object.keys(data).forEach(key => {
+
+    const elemento = document.getElementById(key);
+    if (!elemento) return;
+
+    const valor = data[key];
+    const num = Number(valor);
+
+    elemento.textContent = valor;
+
+    // Animación
+    elemento.classList.add("update");
+    setTimeout(() => elemento.classList.remove("update"), 200);
+
+    /* ===== Aplicar reglas dinámicas ===== */
+
+    if (!limits[key]) return;
+
+    const config = limits[key];
+
+    // Más alto es mejor
+    if (config.type === "higher") {
+
+      if (num >= config.green) elemento.style.color = "#00ff88";
+      else if (num >= config.yellow) elemento.style.color = "#ffc107";
+      else elemento.style.color = "#ff4d4d";
+    }
+
+    // Más bajo es mejor
+    if (config.type === "lower") {
+
+      if (num <= config.green) elemento.style.color = "#00ff88";
+      else if (num <= config.yellow) elemento.style.color = "#ffc107";
+      else elemento.style.color = "#ff4d4d";
+    }
+
+    // Rango ideal (ej mvr)
+    if (config.type === "range") {
+
+      if (num <= config.yellow && num >= config.green)
+        elemento.style.color = "#00ff88";
+      else
+        elemento.style.color = "#ffc107";
+    }
+  });
 }
 
-/* ============================================
-REFRESCO AUTOMÁTICO
-============================================ */
+/* ===== Refresco automático ===== */
 
-// cada 5 segundos
 setInterval(obtenerDatos, 5000);
-
-// primera carga inmediata
 obtenerDatos();
