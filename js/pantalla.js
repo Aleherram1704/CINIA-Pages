@@ -1,20 +1,25 @@
-function initPantalla(screenId) {
+const SERVER_IP = "10.50.83.96";
+
+function initPantalla(screenId){
 
   const player = document.getElementById("player");
-  const SERVER_IP = "10.50.83.96"; // cambiar según red
 
-  const PLAYLIST_URL = `http://${SERVER_IP}:1880/playlist/${screenId}`;
+  const PLAYLIST_URL = `http://${SERVER_IP}:1880/${screenId}/playlist.json`;
 
   let playlist = [];
   let currentIndex = 0;
   let imageTimer = null;
 
-  async function cargarPlaylist() {
-    try {
-      const res = await fetch(PLAYLIST_URL);
-      playlist = await res.json();
+  async function cargarPlaylist(){
 
-      if (!playlist.length) {
+    try{
+
+      const res = await fetch(PLAYLIST_URL);
+      const data = await res.json();
+
+      playlist = data.Media;
+
+      if(!playlist.length){
         player.innerHTML = `<p class="empty-msg">Sin contenido</p>`;
         return;
       }
@@ -22,34 +27,44 @@ function initPantalla(screenId) {
       currentIndex = 0;
       playItem();
 
-    } catch (err) {
-      console.error("Error cargando playlist:", err);
-      player.innerHTML = `<p class="empty-msg">Servidor no disponible</p>`;
+    }catch(err){
+
+      console.error("Error cargando playlist:",err);
+
+      player.innerHTML = `<p class="empty-msg">Error cargando contenido</p>`;
+
     }
+
   }
 
-  function playItem() {
+  function playItem(){
 
     clearTimeout(imageTimer);
+
     player.innerHTML = "";
 
-    const item = playlist[currentIndex];
-    if (!item) return;
+    const file = playlist[currentIndex];
 
-    if (item.type === "image") {
+    const url = `http://${SERVER_IP}:1880/${screenId}/${file}`;
+
+    if(file.match(/\.(jpg|jpeg|png|gif|webp)$/i)){
 
       const img = document.createElement("img");
-      img.src = item.src;
+
+      img.src = url;
       img.className = "media";
+
       player.appendChild(img);
 
-      imageTimer = setTimeout(nextItem, 5000);
+      imageTimer = setTimeout(nextItem,5000);
+
     }
 
-    else if (item.type === "video") {
+    else if(file.match(/\.(mp4|webm|mov)$/i)){
 
       const video = document.createElement("video");
-      video.src = item.src;
+
+      video.src = url;
       video.autoplay = true;
       video.muted = true;
       video.playsInline = true;
@@ -59,18 +74,26 @@ function initPantalla(screenId) {
 
       player.appendChild(video);
 
-      video.play().catch(err => {
-        console.warn("Autoplay bloqueado:", err);
+      video.play().catch(err=>{
+        console.warn("Autoplay bloqueado",err);
       });
+
     }
+
   }
 
-  function nextItem() {
+  function nextItem(){
+
     currentIndex++;
-    if (currentIndex >= playlist.length) currentIndex = 0;
+
+    if(currentIndex >= playlist.length){
+      currentIndex = 0;
+    }
+
     playItem();
+
   }
 
   cargarPlaylist();
-  setInterval(cargarPlaylist, 30000);
+
 }

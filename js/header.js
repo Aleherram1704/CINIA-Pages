@@ -29,7 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
     <a href="construccion.html" class="nav-item" data-page="construccion.html">Pantalla 15</a>
   </nav>
 
-  <div class="header-right"></div>
+  <div class="header-right">
+    <button id="displayToggle" class="display-toggle">Display</button>
+  </div>
 `;
 
   document.body.prepend(header);
@@ -38,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentPage = window.location.pathname.split("/").pop();
 
-  // cuando entras a "/" queda vacío → es index
   if (currentPage === "" || currentPage === "/") {
     currentPage = "index.html";
   }
@@ -49,6 +50,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (item.dataset.page === currentPage) {
       item.classList.add("active");
     }
+  });
+
+  /* ===== BOTÓN DISPLAY MODE ===== */
+
+  const toggleBtn = document.getElementById("displayToggle");
+
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("display-mode");
+  });
+
+  /* ===== TECLA RÁPIDA (F9) ===== */
+
+  document.addEventListener("keydown", (e) => {
+
+    if (e.key === "F9") {
+      document.body.classList.toggle("display-mode");
+    }
+
   });
 
 });

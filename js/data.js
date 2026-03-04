@@ -1,8 +1,12 @@
-const API_URL = "http://10.50.83.96:1880/indicadores";
 
 /* ===== Detectar pantalla automáticamente ===== */
 
 const screenId = document.body.dataset.screen || "pantalla1";
+
+/* ===== Endpoint dinámico ===== */
+
+const API_URL = `http://${SERVER_IP}:1880/${screenId}`;
+
 
 /* ===== Cargar límites dinámicos por pantalla ===== */
 
@@ -12,20 +16,29 @@ function loadLimits() {
   ) || {};
 }
 
+
 /* ===== Obtener datos ===== */
 
 async function obtenerDatos() {
   try {
+
     const res = await fetch(API_URL);
+
+    if (!res.ok) throw new Error("API no disponible");
+
     const data = await res.json();
 
     console.log("Datos recibidos:", data);
+
     actualizarUI(data);
 
   } catch (err) {
-    console.error("Error leyendo Node-RED:", err);
+
+    console.warn("Error leyendo Node-RED:", err);
+
   }
 }
+
 
 /* ===== Actualizar UI ===== */
 
@@ -43,17 +56,13 @@ function actualizarUI(data) {
 
     elemento.textContent = valor;
 
-    // Animación
     elemento.classList.add("update");
     setTimeout(() => elemento.classList.remove("update"), 200);
-
-    /* ===== Aplicar reglas dinámicas ===== */
 
     if (!limits[key]) return;
 
     const config = limits[key];
 
-    // Más alto es mejor
     if (config.type === "higher") {
 
       if (num >= config.green) elemento.style.color = "#00ff88";
@@ -61,7 +70,6 @@ function actualizarUI(data) {
       else elemento.style.color = "#ff4d4d";
     }
 
-    // Más bajo es mejor
     if (config.type === "lower") {
 
       if (num <= config.green) elemento.style.color = "#00ff88";
@@ -69,7 +77,6 @@ function actualizarUI(data) {
       else elemento.style.color = "#ff4d4d";
     }
 
-    // Rango ideal (ej mvr)
     if (config.type === "range") {
 
       if (num <= config.yellow && num >= config.green)
@@ -77,8 +84,11 @@ function actualizarUI(data) {
       else
         elemento.style.color = "#ffc107";
     }
+
   });
+
 }
+
 
 /* ===== Refresco automático ===== */
 
