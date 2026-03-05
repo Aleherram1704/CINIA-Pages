@@ -1,3 +1,5 @@
+const SERVER_IP = "10.50.85.88";
+
 const METRIC_KEYS = [
   "rendimiento",
   "ppm",
@@ -25,23 +27,51 @@ let currentScreen = "pantalla1";
 const grid = document.getElementById("screenSelectorGrid");
 const editor = document.getElementById("limitsEditor");
 const saveBtn = document.getElementById("saveLimits");
-const deleteBtn = document.getElementById("deleteMedia");
+
+/* ===== Detectar contenido en Node-RED ===== */
+
+async function checkScreenContent(screenId) {
+
+  const url = `http://${SERVER_IP}:1880/${screenId}/playlist.json`;
+
+  try {
+
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error("playlist no encontrada");
+
+    const data = await res.json();
+
+    if (data.Media && data.Media.length > 0) {
+      return true;
+    }
+
+    return false;
+
+  } catch (err) {
+
+    console.warn("No se pudo leer playlist de", screenId);
+    return false;
+
+  }
+
+}
 
 /* ===== Render selector visual ===== */
 
-function renderScreenSelector() {
+async function renderScreenSelector() {
 
   grid.innerHTML = "";
 
   for (let i = 1; i <= TOTAL_SCREENS; i++) {
 
     const screenId = "pantalla" + i;
-    const hasMedia = 
-      localStorage.getItem("media_" + screenId) ||
-      localStorage.getItem("playlist_" + screenId);
+
+    const hasMedia = await checkScreenContent(screenId);
 
     const card = document.createElement("div");
     card.className = "screen-card";
+
     if (screenId === currentScreen) card.classList.add("active");
 
     card.innerHTML = `
@@ -75,7 +105,6 @@ function loadLimits() {
   if (!saved) {
     limits = JSON.parse(JSON.stringify(DEFAULT_LIMITS));
   } else {
-    // Mezcla defaults con lo guardado
     limits = { ...DEFAULT_LIMITS, ...saved };
   }
 }
@@ -127,18 +156,6 @@ saveBtn.addEventListener("click", () => {
   localStorage.setItem("metricLimits_" + currentScreen, JSON.stringify(limits));
 
   alert("Límites guardados para " + currentScreen);
-});
-
-/* ===== Borrar contenido ===== */
-
-deleteBtn.addEventListener("click", () => {
-
-  if (!confirm("¿Seguro que quieres borrar el contenido?")) return;
-
-  localStorage.removeItem("media_" + currentScreen);
-
-  renderScreenSelector();
-  alert("Contenido eliminado.");
 });
 
 /* ===== Inicializar ===== */

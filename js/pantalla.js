@@ -1,4 +1,4 @@
-const SERVER_IP = "10.50.83.96";
+const SERVER_IP = "10.50.85.88";
 
 function initPantalla(screenId){
 
