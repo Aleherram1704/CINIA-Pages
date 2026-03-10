@@ -389,13 +389,13 @@ input[type="file"] {
 }
 
 .counter-card h3 {
-  font-size: clamp(12px, 1.2vw, 16px);
+  font-size: clamp(24px, 1.2vw, 40px);
   margin-bottom: 6px;
   color: #cbd5e1;
 }
 
 .counter {
-  font-size: clamp(28px, 2.5vw, 42px);
+  font-size: clamp(70px, 2.5vw, 80px);
   font-weight: bold;
   color: #38bdf8;
 }
@@ -532,7 +532,7 @@ input[type="file"] {
 }
 
 .counter {
-  font-size: 48px;
+  font-size: 70px;
   font-weight: bold;
   transition: transform 0.2s ease;
 }
@@ -971,31 +971,6 @@ input[type="file"] {
   overflow: hidden;
 }
 
-/* ===== CONTADORES ===== */
-
-.counter-card {
-  background: linear-gradient(145deg, #0f172a, #020617);
-  border-radius: 18px;
-  padding: 14px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 100px;
-}
-
-.counter-card h3 {
-  font-size: clamp(12px, 1.2vw, 16px);
-  margin-bottom: 6px;
-  color: #cbd5e1;
-}
-
-.counter {
-  font-size: clamp(28px, 2.5vw, 42px);
-  font-weight: bold;
-  color: #38bdf8;
-}
-
 /* botón abajo */
 .screen-controls {
   margin-top: auto;
@@ -1154,7 +1129,7 @@ input[type="file"] {
 } 
 
 .counter {
-  font-size: 42px;
+  font-size: 60px;
   font-weight: bold;
   transition: transform 0.2s ease, color 0.3s ease;
 }
@@ -1172,7 +1147,7 @@ input[type="file"] {
   }
 
   .counter {
-    font-size: 26px;
+    font-size: 80px;
   }
 }
 
@@ -1182,7 +1157,7 @@ input[type="file"] {
   }
 
   .counter {
-    font-size: 56px;
+    font-size: 80px;
   }
 }
 
@@ -1192,7 +1167,7 @@ input[type="file"] {
   }
 
   .counter {
-    font-size: 68px;
+    font-size: 80px;
   }
 }
 
